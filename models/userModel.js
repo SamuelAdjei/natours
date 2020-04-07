@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
   photo: String,
   role: {
     type: String,
-    enum: ['user', 'guide', 'lead-guide', 'admin'],
+    enum: ['user', 'event-creator', 'admin'],
     default: 'user'
   },
   password: {
@@ -39,17 +39,19 @@ const userSchema = new mongoose.Schema({
   },
   passwordChangedAt: Date,
   passwordResetToken: String,
-  passwordResetExpires: Date
+  passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false
+  }
 });
 
 userSchema.pre('save', async function(next) {
-  // only run this function if password was actually modified
   if (!this.isModified('password')) return next();
 
-  // hashing password with cost of 12
   this.password = await bcrypt.hash(this.password, 12);
 
-  // Delete passwordConfirm field
   this.passwordConfirm = undefined;
   next();
 });
@@ -61,7 +63,11 @@ userSchema.pre('save', function(next) {
   next();
 });
 
-// confirm that the hash password === user password
+userSchema.pre(/^find/, function(next) {
+  this.find({ active: { $ne: false } });
+  next();
+});
+
 userSchema.methods.correctPassword = async function(
   candidatePassword,
   userPassword
@@ -76,10 +82,8 @@ userSchema.methods.changedPasswordAfter = function(JWTTimestamp) {
       10
     );
 
-    // console.log(changedTimestamp, JWTTimestamp);
     return JWTTimestamp < changedTimestamp;
   }
-  // False means NOT changed
   return false;
 };
 
@@ -99,5 +103,4 @@ userSchema.methods.createPasswordResetToken = function() {
 };
 
 const User = mongoose.model('User', userSchema);
-
 module.exports = User;
