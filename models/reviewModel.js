@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
+<<<<<<< HEAD
+const reviewSchema = new momgoose.Schema(
+=======
 const reviewSchema = new mongoose.Schema(
+>>>>>>> master
   {
     review: {
       type: String,
