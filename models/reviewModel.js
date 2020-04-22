@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const reviewSchema = new momgoose.Schema(
+const reviewSchema = new mongoose.Schema(
   {
     review: {
       type: String,
