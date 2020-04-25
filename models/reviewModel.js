@@ -1,14 +1,11 @@
+// review / rating / createdAt / ref to tour / ref to user
 const mongoose = require('mongoose');
 
-<<<<<<< HEAD
-const reviewSchema = new momgoose.Schema(
-=======
 const reviewSchema = new mongoose.Schema(
->>>>>>> master
   {
     review: {
       type: String,
-      required: [true, 'A review cannot be empty! ']
+      required: [true, 'Review can not be empty!']
     },
     rating: {
       type: Number,
@@ -17,18 +14,17 @@ const reviewSchema = new mongoose.Schema(
     },
     createdAt: {
       type: Date,
-      default: Date.now(),
-      select: false
+      default: Date.now
     },
     tour: {
       type: mongoose.Schema.ObjectId,
       ref: 'Tour',
-      required: [true, 'A review must belong to a tour']
+      required: [true, 'Review must belong to a tour.']
     },
     user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
-      required: [true, 'A review must belong to a user']
+      required: [true, 'Review must belong to a user']
     }
   },
   {
