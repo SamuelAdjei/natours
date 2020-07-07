@@ -13,7 +13,7 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const viewRouter = require('./routes/viewRoutes');
-
+const cookieParser = require('cookie-parser');
 const app = express();
 
 app.set('view engine', 'pug');
@@ -23,6 +23,10 @@ app.set('views', path.join(__dirname, 'views'));
 // Serving static files
 // app.use(express.static(`${__dirname}/public`));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
+});
 
 // Set Security HTTP Headers
 app.use(helmet());
@@ -42,6 +46,7 @@ app.use('/api', limiter);
 
 // Body Parser, reading data from the body into req.body
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 
 // Data sanitisation against NoSQL Query injection
 app.use(mongoSanitize());
@@ -66,9 +71,24 @@ app.use(xss());
 // Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
-  // console.log(req.headers);
+  console.log(req.cookies);
   next();
 });
+
+// Allows for CORS
+
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   res.header(
+//     'Access-Control-Allow-Headers',
+//     'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+//   );
+//   if (req.method === 'OPTIONS') {
+//     res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+//     return res.status(200).json();
+//   }
+//   next();
+// });
 
 // 3) ROUTES
 
