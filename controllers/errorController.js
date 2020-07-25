@@ -70,18 +70,15 @@ const sendErrorProd = (err, req, res) => {
       title: 'Something went wrong!',
       msg: err.message
     });
-
-    // B)Programming or other unknown error: don't leak error details
-  } else {
-    // 1) Log error
-    console.error('ERROR 💥', err);
-
-    // 2) Send generic message
-    res.status(err.statusCode).render('error', {
-      title: 'Something went wrong!',
-      msg: 'Please try again later.'
-    });
   }
+  // B)Programming or other unknown error: don't leak error details
+  // 1) Log error
+  console.error('ERROR 💥', err);
+  // 2) Send generic message
+  return res.status(err.statusCode).render('error', {
+    title: 'Something went wrong!',
+    msg: 'Please try again later.'
+  });
 };
 
 module.exports = (err, req, res, next) => {
@@ -94,6 +91,7 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, req, res);
   } else if (process.env.NODE_ENV === 'production') {
     let error = { ...err };
+    error.message = err.message;
 
     if (error.name === 'CastError') error = handleCastErrorDB(error);
     if (error.code === 11000) error = handleDuplicateFieldsDB(error);
